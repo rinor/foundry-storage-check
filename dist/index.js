@@ -366,6 +366,7 @@ const contract = core.getInput("contract");
 const address = core.getInput("address");
 const rpcUrl = core.getInput("rpcUrl");
 const failOnRemoval = core.getInput("failOnRemoval") === "true";
+const baseDir = core.getInput("baseDir");
 const contractEscaped = contract.replace(/\//g, "_").replace(/:/g, "-");
 const getReportPath = (branch, baseName) => `${branch.replace(/[/\\]/g, "-")}.${baseName}.json`;
 const baseReport = getReportPath(baseBranch, contractEscaped);
@@ -379,6 +380,14 @@ let srcContent;
 let refCommitHash;
 async function run() {
     core.startGroup(`Generate storage layout of contract "${contract}" using foundry forge`);
+    core.info(`Starting directory: ${process.cwd()}`);
+    try {
+        process.chdir(baseDir);
+        core.info(`New directory: ${process.cwd()}`);
+    }
+    catch (err) {
+        core.error(`chdir: ${err}`);
+    }
     core.info(`Start forge process`);
     const cmpContent = (0, input_1.createLayout)(contract);
     core.info(`Parse generated layout`);
